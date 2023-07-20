@@ -2,7 +2,7 @@
 
 ## Programs
 
-- [Hello World](hello_world)
+- [Hello World](projects/hello_world)
 
 ## References
 

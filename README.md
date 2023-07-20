@@ -2,7 +2,8 @@
 
 ## Programs
 
-- [Hello World](projects/hello_world)
+- [Hello World](projects/hello-world)
+- [Guessing Game](projects/guessing-game)
 
 ## References
 

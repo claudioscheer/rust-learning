@@ -1,11 +1,11 @@
 use super::formula::FormulaError;
 
 fn add(a: String, b: String) -> String {
-    return String::from("0");
+    return (a.parse::<i32>().unwrap() + b.parse::<i32>().unwrap()).to_string();
 }
 
 fn sub(a: String, b: String) -> String {
-    return String::from("0");
+    return (a.parse::<i32>().unwrap() - b.parse::<i32>().unwrap()).to_string();
 }
 
 fn operate(a: String, b: String, operator: char) -> Result<String, FormulaError> {
@@ -23,8 +23,8 @@ pub fn evaluate_postfix(formula: &str) -> Result<String, FormulaError> {
         match token {
             '0'..='9' => stack.push(token.to_string()),
             '+' | '-' => {
-                let a = stack.pop().unwrap();
                 let b = stack.pop().unwrap();
+                let a = stack.pop().unwrap();
                 stack.push(operate(a, b, token)?);
             }
             ' ' => {}
@@ -33,4 +33,28 @@ pub fn evaluate_postfix(formula: &str) -> Result<String, FormulaError> {
     }
 
     return Ok(stack.pop().unwrap());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        assert_eq!(add("1".to_string(), "2".to_string()), "3");
+    }
+
+    #[test]
+    fn test_sub() {
+        assert_eq!(sub("1".to_string(), "2".to_string()), "-1");
+    }
+
+    #[test]
+    fn test_evaluate_postfix() -> Result<(), FormulaError> {
+        assert_eq!(evaluate_postfix("3 4 +")?, "7");
+        assert_eq!(evaluate_postfix("3 4 + 9 -")?, "-2");
+        assert_eq!(evaluate_postfix("3 4 + 9 - 5 + 4 - 2 -")?, "-3");
+
+        return Ok(());
+    }
 }

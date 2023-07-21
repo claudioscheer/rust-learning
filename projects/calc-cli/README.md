@@ -1,4 +1,4 @@
-## About
+## calc-cli
 
 This is a simple calculator that evaluates expressions like the following:
 

@@ -1,39 +1,31 @@
-use super::formula::FormulaError;
+use super::formula::{FormulaError, Node, Operator};
 
-fn add(a: i32, b: i32) -> i32 {
+fn add(a: f64, b: f64) -> f64 {
     return a + b;
 }
 
-fn sub(a: i32, b: i32) -> i32 {
+fn sub(a: f64, b: f64) -> f64 {
     return a - b;
 }
 
-fn operate(a: i32, b: i32, operator: char) -> Result<i32, FormulaError> {
+fn operate(a: f64, b: f64, operator: Operator) -> f64 {
     match operator {
-        '+' => return Ok(add(a, b)),
-        '-' => return Ok(sub(a, b)),
-        _ => return Err(FormulaError::InvalidOperator(operator)),
+        Operator::Plus => return add(a, b),
+        Operator::Minus => return sub(a, b),
     }
 }
 
-pub fn evaluate_postfix(formula: &str) -> Result<i32, FormulaError> {
-    let mut stack: Vec<i32> = Vec::new();
+pub fn evaluate_postfix(nodes: &Vec<Node>) -> Result<f64, FormulaError> {
+    let mut stack: Vec<f64> = Vec::new();
 
-    for token in formula.chars() {
-        match token {
-            '0'..='9' => {
-                let n = token
-                    .to_digit(10)
-                    .ok_or_else(|| FormulaError::ParseError(token))? as i32;
-                stack.push(n);
-            }
-            '+' | '-' => {
+    for node in nodes {
+        match node {
+            Node::Value(n) => stack.push(n.to_owned()),
+            Node::Operator(op) => {
                 let b = stack.pop().unwrap();
                 let a = stack.pop().unwrap();
-                stack.push(operate(a, b, token)?);
+                stack.push(operate(a, b, *op));
             }
-            ' ' => {}
-            _ => return Err(FormulaError::InvalidCharacter(token)),
         }
     }
 
@@ -46,19 +38,34 @@ mod tests {
 
     #[test]
     fn test_add() {
-        assert_eq!(add(1, 2), 3);
+        assert_eq!(add(1., 2.), 3.);
     }
 
     #[test]
     fn test_sub() {
-        assert_eq!(sub(1, 2), -1);
+        assert_eq!(sub(1., 2.), -1.);
     }
 
     #[test]
     fn test_evaluate_postfix() -> Result<(), FormulaError> {
-        assert_eq!(evaluate_postfix("3 4 +")?, 7);
-        assert_eq!(evaluate_postfix("3 4 + 9 -")?, -2);
-        assert_eq!(evaluate_postfix("3 4 + 9 - 5 + 4 - 2 -")?, -3);
+        assert_eq!(
+            evaluate_postfix(&vec![
+                Node::Value(3.),
+                Node::Value(4.),
+                Node::Operator(Operator::Plus)
+            ])?,
+            7.
+        );
+        assert_eq!(
+            evaluate_postfix(&vec![
+                Node::Value(3.),
+                Node::Value(4.),
+                Node::Operator(Operator::Plus),
+                Node::Value(11.),
+                Node::Operator(Operator::Minus)
+            ])?,
+            -4.
+        );
 
         return Ok(());
     }

@@ -10,7 +10,7 @@ fn main() -> io::Result<()> {
     io::stdin().read_line(&mut formula)?;
 
     let postfix = sya::parse::infix_to_postfix(&formula.trim()).unwrap();
-    println!("The postfix formula is: {postfix}");
+    println!("The postfix formula is: {:?}", postfix);
 
     let result = sya::evaluate::evaluate_postfix(&postfix).unwrap();
     println!("The result is: {result}");

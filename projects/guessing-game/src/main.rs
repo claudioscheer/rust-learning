@@ -1,4 +1,5 @@
 mod random_number;
+
 use std::cmp::Ordering;
 use std::io::{stdin, stdout, Write};
 

@@ -1,14 +1,14 @@
 use super::formula::FormulaError;
 
-fn add(a: String, b: String) -> String {
-    return (a.parse::<i32>().unwrap() + b.parse::<i32>().unwrap()).to_string();
+fn add(a: i32, b: i32) -> i32 {
+    return a + b;
 }
 
-fn sub(a: String, b: String) -> String {
-    return (a.parse::<i32>().unwrap() - b.parse::<i32>().unwrap()).to_string();
+fn sub(a: i32, b: i32) -> i32 {
+    return a - b;
 }
 
-fn operate(a: String, b: String, operator: char) -> Result<String, FormulaError> {
+fn operate(a: i32, b: i32, operator: char) -> Result<i32, FormulaError> {
     match operator {
         '+' => return Ok(add(a, b)),
         '-' => return Ok(sub(a, b)),
@@ -16,12 +16,17 @@ fn operate(a: String, b: String, operator: char) -> Result<String, FormulaError>
     }
 }
 
-pub fn evaluate_postfix(formula: &str) -> Result<String, FormulaError> {
-    let mut stack: Vec<String> = Vec::new();
+pub fn evaluate_postfix(formula: &str) -> Result<i32, FormulaError> {
+    let mut stack: Vec<i32> = Vec::new();
 
     for token in formula.chars() {
         match token {
-            '0'..='9' => stack.push(token.to_string()),
+            '0'..='9' => {
+                let n = token
+                    .to_digit(10)
+                    .ok_or_else(|| FormulaError::ParseError(token))? as i32;
+                stack.push(n);
+            }
             '+' | '-' => {
                 let b = stack.pop().unwrap();
                 let a = stack.pop().unwrap();
@@ -41,19 +46,19 @@ mod tests {
 
     #[test]
     fn test_add() {
-        assert_eq!(add("1".to_string(), "2".to_string()), "3");
+        assert_eq!(add(1, 2), 3);
     }
 
     #[test]
     fn test_sub() {
-        assert_eq!(sub("1".to_string(), "2".to_string()), "-1");
+        assert_eq!(sub(1, 2), -1);
     }
 
     #[test]
     fn test_evaluate_postfix() -> Result<(), FormulaError> {
-        assert_eq!(evaluate_postfix("3 4 +")?, "7");
-        assert_eq!(evaluate_postfix("3 4 + 9 -")?, "-2");
-        assert_eq!(evaluate_postfix("3 4 + 9 - 5 + 4 - 2 -")?, "-3");
+        assert_eq!(evaluate_postfix("3 4 +")?, 7);
+        assert_eq!(evaluate_postfix("3 4 + 9 -")?, -2);
+        assert_eq!(evaluate_postfix("3 4 + 9 - 5 + 4 - 2 -")?, -3);
 
         return Ok(());
     }

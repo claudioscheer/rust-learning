@@ -4,6 +4,7 @@
 
 - [Hello World](projects/hello-world)
 - [Guessing Game](projects/guessing-game)
+- [CLI Calculator](projects/calc-cli)
 
 ## References
 
